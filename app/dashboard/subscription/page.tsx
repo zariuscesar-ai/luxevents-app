@@ -2,7 +2,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { PLANS } from '@/lib/stripe'
+import { PLANS } from '@/lib/stripe-client'
 import { CheckCircle, Zap } from 'lucide-react'
 
 export default function SubscriptionPage() {
