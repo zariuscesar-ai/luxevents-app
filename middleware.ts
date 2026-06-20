@@ -22,11 +22,19 @@ export async function middleware(request: NextRequest) {
   )
 
   const { data: { user } } = await supabase.auth.getUser()
-
   const url = request.nextUrl.clone()
 
-  // Protect dashboard routes
+  // Protect dashboard & client routes
   if (url.pathname.startsWith('/dashboard') || url.pathname.startsWith('/client')) {
+    if (!user) {
+      url.pathname = '/login'
+      url.searchParams.set('redirect', request.nextUrl.pathname)
+      return NextResponse.redirect(url)
+    }
+  }
+
+  // Protect admin routes — must be logged in (role check happens client-side)
+  if (url.pathname.startsWith('/admin')) {
     if (!user) {
       url.pathname = '/login'
       url.searchParams.set('redirect', request.nextUrl.pathname)
