@@ -13,8 +13,9 @@ const STATUS_STYLES: Record<string, string> = {
   cancelled: 'bg-red-100 text-red-700',
 }
 
-export default async function ClientBookingsPage({ searchParams }: { searchParams: { success?: string } }) {
-  const supabase = await createClient()
+export default async function ClientBookingsPage({ searchParams }: { searchParams: Promise<{ success?: string }> }) {
+const { success } = await searchParams
+    const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
@@ -28,7 +29,7 @@ export default async function ClientBookingsPage({ searchParams }: { searchParam
     <div className="min-h-screen bg-gray-50">
       <Header />
       <div className="pt-24 pb-16 max-w-4xl mx-auto px-4">
-        {searchParams.success && (
+        {success && (
           <div className="flex items-center gap-3 bg-green-50 border border-green-200 rounded-2xl p-4 mb-6">
             <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
             <p className="text-green-700 font-medium">Booking confirmed! We'll notify the vendor and send you a confirmation email.</p>

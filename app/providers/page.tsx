@@ -14,27 +14,28 @@ interface SearchParams {
   q?: string
 }
 
-export default async function ProvidersPage({ searchParams }: { searchParams: SearchParams }) {
-  const supabase = await createClient()
+export default async function ProvidersPage({ searchParams }: { searchParams: Promise<SearchParams> }) {
+const params = await searchParams
+    const supabase = await createClient()
 
   let query = supabase
     .from('providers')
     .select('*, provider_media(*)')
     .eq('is_active', true)
 
-  if (searchParams.category) query = query.eq('category', searchParams.category)
-  if (searchParams.city) query = query.ilike('city', `%${searchParams.city}%`)
-  if (searchParams.featured === 'true') query = query.eq('is_featured', true)
-  if (searchParams.q) query = query.ilike('business_name', `%${searchParams.q}%`)
+  if (params.category) query = query.eq('category', params.category)
+  if (params.city) query = query.ilike('city', `%${params.city}%`)
+  if (params.featured === 'true') query = query.eq('is_featured', true)
+  if (params.q) query = query.ilike('business_name', `%${params.q}%`)
 
-  if (searchParams.sort === 'price_asc') query = query.order('min_price', { ascending: true })
-  else if (searchParams.sort === 'price_desc') query = query.order('min_price', { ascending: false })
+  if (params.sort === 'price_asc') query = query.order('min_price', { ascending: true })
+  else if (params.sort === 'price_desc') query = query.order('min_price', { ascending: false })
   else query = query.order('is_featured', { ascending: false }).order('rating', { ascending: false })
 
   const { data: providers } = await query.limit(48)
 
   const categories = Object.entries(CATEGORY_LABELS) as [ProviderCategory, string][]
-  const activeCategory = searchParams.category as ProviderCategory | undefined
+  const activeCategory = params.category as ProviderCategory | undefined
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -99,10 +100,10 @@ export default async function ProvidersPage({ searchParams }: { searchParams: Se
                 </div>
                 <select
                   className="ml-auto border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 bg-white focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                  defaultValue={searchParams.sort || 'default'}
+                  defaultValue={params.sort || 'default'}
                   onChange={(e) => {
                     const url = new URL(window.location.href)
-                    url.searchParams.set('sort', e.target.value)
+                    url.params.set('sort', e.target.value)
                     window.location.href = url.toString()
                   }}
                 >

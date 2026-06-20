@@ -12,9 +12,10 @@ import {
   Calendar, Users, Clock, MessageCircle, Phone
 } from 'lucide-react'
 
-export async function generateMetadata({ params }: { params: { slug: string } }) {
-  const supabase = await createClient()
-  const { data } = await supabase.from('providers').select('business_name, description').eq('slug', params.slug).single()
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+const { slug } = await params
+    const supabase = await createClient()
+  const { data } = await supabase.from('providers').select('business_name, description').eq('slug', slug).single()
   if (!data) return { title: 'Vendor Not Found' }
   return {
     title: `${data.business_name} — LuxEvents`,
@@ -22,12 +23,13 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   }
 }
 
-export default async function ProviderProfilePage({ params }: { params: { slug: string } }) {
-  const supabase = await createClient()
+export default async function ProviderProfilePage({ params }: { params: Promise<{ slug: string }> }) {
+const { slug } = await params
+    const supabase = await createClient()
   const { data: provider } = await supabase
     .from('providers')
     .select('*, provider_media(*), services(*)')
-    .eq('slug', params.slug)
+    .eq('slug', slug)
     .eq('is_active', true)
     .single()
 
