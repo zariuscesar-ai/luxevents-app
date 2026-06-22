@@ -5,6 +5,7 @@ import ProviderCard from '@/components/providers/ProviderCard'
 import type { Provider, ProviderCategory } from '@/types/database'
 import { CATEGORY_LABELS, CATEGORY_ICONS } from '@/types/database'
 import { SlidersHorizontal } from 'lucide-react'
+import { SortSelect } from './SortSelect'
 
 interface SearchParams {
   category?: string
@@ -98,19 +99,7 @@ const params = await searchParams
                     </a>
                   ))}
                 </div>
-                <select
-                  className="ml-auto border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 bg-white focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                  defaultValue={params.sort || 'default'}
-                  onChange={(e) => {
-                    const url = new URL(window.location.href)
-                    url.params.set('sort', e.target.value)
-                    window.location.href = url.toString()
-                  }}
-                >
-                  <option value="default">Top Rated</option>
-                  <option value="price_asc">Price: Low to High</option>
-                  <option value="price_desc">Price: High to Low</option>
-                </select>
+                <SortSelect defaultValue={params.sort || 'default'} />>
               </div>
 
               {providers && providers.length > 0 ? (
